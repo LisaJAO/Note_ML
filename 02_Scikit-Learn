@@ -1,0 +1,9 @@
+Scikit-learn安裝 (在Anaconda有耶 XD): Python(>=2.6 or >=3.3) / Numpy(>=1.6.1) / SciPy(>=0.9)
+若沒有的話就在windows cmd 輸入: pip install -U scikit-learn   #-U 是update的意思
+
+Sciket-learn 流程圖: https://scikit-learn.org/stable/tutorial/machine_learning_map/index.html
+
+1. 監督學習Classification
+2. 監督學習Regression
+3. 非監督學習Clustering
+4. 非監督學習Dimensionality Reduction
