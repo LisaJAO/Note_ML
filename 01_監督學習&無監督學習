@@ -16,10 +16,51 @@ ML
        3. 最小平方法(Least Squares)
           線性回歸分析模型中, 求殘差平方和為最小的點估計量:求出一直線Y=a+bx+e,並對每一個點計算到直線的(垂直距離)^2,再相加 
                                                         => 最小化{e^2的相加總合}
-    ***4. 邏輯回歸(Logistic Regression) 
+    ***4. 邏輯回歸(Logistic Regression) : 線性-> 機率-> 類別
           將多個自變量X 來表示一個二項式結果
           透過邏輯函數來估計機率
-          衡量依變量Y和多個自變量X間的關係 , 其中自變量X服從累計邏輯分布
+          衡量依變量Y和多個自變量X間的關係 , 其中自變量X符合累計邏輯分布
+          1) 線性模型: y = w * x + b   ==> 目標: 找合適的w和b , 使y所組成的線慢慢地接近所有的樣本點.
+          2) 得到的分數y 標籤化: 
+             a) Sigmoid函數: Sigmoid(x)=1/(1+exp(-x))
+                適用於只對一個類別進行分類的情況
+                將得到的分數y規範到(0,1)之間,函數值大於設定值則為1.
+                以對數的方式對應到(0,1),強化分數大的作用,提高其輸出的機率. 降低分數小的輸出機率.
+                def sigmoid(s):
+                return 1. / (1+np.exp(-s))
+                
+             b) Softmax函數: softmax(s)=exp(s) / sum(exp(s)
+                適用於對多個類別進行分類的情況
+                將得到的分數規範到(0,1)之間,分數和為1.
+                以對數的方式對應到(0,1),強化分數大的機率值, 弱化分數小的機率值
+                
+                x1 -- y1=wx+b -- sigmoid(s1)--           -- 機率p1 -- 類一        
+                x2 -- y2=wx+b -- sigmoid(s2)--  Softmax  -- 機率p2 -- 類二
+                x3 -- y3=wx+b -- sigmoid(s3)--           -- 機率p3 -- 類三
+                
+                def softmax(s):
+                  return np.exp(s)/ np.sum(np.exp(s),axis=0)
+          3) 評估預測的準確性
+             目標: 衡量兩個機率分布向量的差異程度: D(y,p)在(0,1)之間,數值越高,兩個機率越相似, 表示模型預測越準確.
+             p= 預測的機率向量 =softmax(score(wx+b))
+             y= 真實的樣本向量
+             D(y,p)= yln(p)+(1-y)(1-ln(p)) 
+             Error= 1-D(y,p) 
+             
+             def cross_entropy(y,p):
+              return np.sum(y*np.log(p)+(1-y)*np.log(1-p,axis=1))
+              
+         4) 訓練模型
+            目標: 獲得更適合的 w 和 b, 是模型更準確.
+            方法: w & b = min(Sum(Error))
+                  L(w,b)= (-1 / M )* (sum D(y,p))
+                  
+            def L(X,w,b,y):
+                s=score(X,w,b)
+                y_p=softmax(s)
+                return -np.mean(cross_entropy(y,y_p))
+          
+          
           應用:信用評分, 計算事件的發生機率, 預測某產品的銷售額, 某天五月天會在我家開演唱會的機率(哈^^哈)
           
        5. 支持向量機(Support vector machine,SVM)
