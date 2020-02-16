@@ -51,15 +51,22 @@ ML
               return np.sum(y*np.log(p)+(1-y)*np.log(1-p,axis=1))
               
          4) 訓練模型
-            目標: 獲得更適合的 w 和 b, 是模型更準確.
-            方法: w & b = min(Sum(Error))
-                  L(w,b)= (-1 / M )* (sum D(y,p))
-                  
+            目標: 獲得更適合的 w 和 b, 使模型更準確/Error最低.
+            方法: w & b => min(Sum(Error))
+                  L(w,b)= (-1 / M )* (sum(D(y,p)))       
             def L(X,w,b,y):
                 s=score(X,w,b)
                 y_p=softmax(s)
                 return -np.mean(cross_entropy(y,y_p))
-          
+            
+            偏導數求x使y最小=> dy/dx = 0
+            import numpy as np
+            #假設函數y=1*x^2+0*x+0
+            y=np.polyid([1,0,0])
+            y(-7)  #輸出49 => 當x=-7時, y=49 
+            #導函數d_yx => 看趨勢
+            d_yx=np.polyder(y)
+            d_yx(-7) # 輸出-14 => 當x=-7,y=49時, 導函數小於0 => x位於向下的趨勢
           
           應用:信用評分, 計算事件的發生機率, 預測某產品的銷售額, 某天五月天會在我家開演唱會的機率(哈^^哈)
           
