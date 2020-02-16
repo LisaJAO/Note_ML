@@ -58,7 +58,7 @@ ML
                 s=score(X,w,b)
                 y_p=softmax(s)
                 return -np.mean(cross_entropy(y,y_p))
-            
+           
             偏導數求x使y最小=> dy/dx = 0
             import numpy as np
             #假設函數y=1*x^2+0*x+0
@@ -67,8 +67,85 @@ ML
             #導函數d_yx => 看趨勢
             d_yx=np.polyder(y)
             d_yx(-7) # 輸出-14 => 當x=-7,y=49時, 導函數小於0 => x位於向下的趨勢
-          
-          應用:信用評分, 計算事件的發生機率, 預測某產品的銷售額, 某天五月天會在我家開演唱會的機率(哈^^哈)
+            
+         5) 實現方式: 一個參數向量
+            a)隨機選一個起點(x0,y0), 計算目的點的導數
+              import random
+              x0=random.uniform(-10,10)
+              y0=random.uniform(-10,10)
+              x0,y0
+              
+            b)依照導數的指引, 再往下一步走到新點(x1,y1)
+              x1=x0-k0, 
+              k0=alpha=走這一步的長度=學習率 
+              => 一般學習率的參數不需要特別去注意, 有時特殊情況需要手動是要注意這會影響Gradient Descent的收斂速度及效果或者收斂失敗.
+              => 學習率設定過小, 則收斂的速度會超乎想像的慢到生無可戀.
+                 學習率設定過大, 則每一步的跨度太長, 則收斂失敗.
+              
+              def step(x,d_yx):
+              alpha=.2
+                  return x-alpha*d_yx(x)
+              step(x0,d_yx)
+              
+            c)重複b)的步驟,進行收斂的動作,找到相對合適的參數.
+              x=x0
+              x_list=[x]
+              for i in range(10):
+              x=step(x,d_yx)
+                 x_list.append(x)
+              x_list
+         5-1) 實現方式: 兩個參數向量
+              b=b-alpha(y-yp)
+            a)隨機選一個起點(w1,w2), 計算目的點的導數.
+            b)依照導數的指引, 再往下一步走到新點(w1,w2).
+            c)重複b)的步驟,進行收斂的動作,找到相對合適的參數.
+            def loss_func(X,w,b,y,w_i):
+                #損失函數對w的偏導數
+                s=score(X,w,b)
+                y_p=softmax(s)
+                return np.mean(wi*(yp-y))
+                
+            def loss_func_b(X,w,b,y,d_obj=i):
+                #損失函數對b的偏導數
+                s=score(X,w,b)
+                y_p=softmax(s)
+                return np.mean(d_obj*(yp-y))
+               
+            def step(X,w,b,y,d_obj,loss_func):
+                #alpha為學習率 /調節參數
+                alpha=.2
+                return wi-alpha*loss_func._call_(X,w,b,y,d_obj)
+                
+            class GDOptimizer:
+              #Gradient Descent => 注意: 找到的參數組合僅是 "局部最佳" ,不代表是"全域最佳".
+              def optimize(X,y):
+                  w1=random.uniform(0,1)
+                  w2=random.uniform(0,1)
+                  b=random.uniform(0,1)
+                  w=[w1,w2]
+                  for i in range(100): #反覆運算100 times
+                      w1=step(X,w,b,y,w1,loss_func)
+                      w2=step(X,w,b,y,w2,loss_func)
+                      b=step(X,w,b,y,b,loss_func_b)
+                      w=[w1,w2]
+         6) 使收斂速度快又穩定的方法: 設平均值=0  &  StandardScaler 歸一化(=>統一尺度)
+            
+            #兩個特徵向量
+            f1=np.array([0.2,0.5,1.1]).reshape(-1,1)
+            f2=np.array([-100.0,56.0,-77.0]).reshape(-1,1)
+            
+            #歸一化
+            f1_scale=(f1-np.mean(f1))/np.std(f1)
+            f2_scale=(f2-np.mean(f2))/np.std(f2)
+            
+            import sklearn.preprocessing as preprocessing
+            scale=preprocessing.StandardScaler()
+            f1_standard=scale.fit_transform(f1)
+            f2_standard=scale.fit_transform(f2)
+            
+            assert np.allclose(f1_standard,f1_scale) and np.allclose(f2_standard,f2_scale)
+
+          應用:信用評分, 計算事件的發生機率, 預測某產品的銷售額, 某天五月天會在我家開演唱會的機率(哈^^哈).
           
        5. 支持向量機(Support vector machine,SVM)
           邏輯回歸的進階版, 可將邏輯回歸得到的線優化,且還可以做非線性分類
